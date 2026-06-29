@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Panel de Administración - SGTA-UPLA">
+  <title>SGTA-UPLA | Panel de Administración</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-icon" id="sidebar-icon"></div>
+          <div class="sidebar-brand-text">
+            <h2>Panel Admin</h2>
+            <p>SGTA-UPLA</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="sidebar-menu" id="sidebar-menu"></div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="logout-btn" class="logout-btn">
+          <span id="logout-icon"></span>
+          <span class="logout-text">Cerrar Sesión</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+      <!-- Header -->
+      <header class="header">
+        <div class="header-inner">
+          <div class="header-left">
+            <button id="toggle-sidebar" class="toggle-sidebar-btn"></button>
+            <div class="search-box">
+              <span id="search-icon"></span>
+              <input type="text" id="search-input" placeholder="Buscar usuarios, roles, actividades...">
+            </div>
+          </div>
+          <div class="header-right">
+            <button class="notification-btn">
+              <span id="bell-icon"></span>
+              <span class="notification-dot"></span>
+            </button>
+            <div class="user-info">
+              <div class="user-info-text">
+                <p class="user-name">Administrador</p>
+                <p class="user-role">Admin del Sistema</p>
+              </div>
+              <div class="user-avatar avatar-admin" id="user-avatar-icon"></div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Main Content Area -->
+      <main class="main-content" id="main-content"></main>
+    </div>
+  </div>
+
+  <!-- Modal Container -->
+  <div id="modal-overlay" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="modal-title">Crear Usuario</h2>
+        <button class="modal-close" onclick="closeUserModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="user-form" class="form-grid">
+          <input type="hidden" id="user-id">
+          <div class="form-group">
+            <label class="form-label">Nombre Completo</label>
+            <input type="text" id="user-name" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Institucional</label>
+            <input type="email" id="user-email" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Contraseña</label>
+            <input type="password" id="user-password" class="form-input" placeholder="Para nuevos usuarios" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Rol</label>
+            <select id="user-role" class="form-select" required>
+              <option value="Estudiante Delegado">Estudiante Delegado</option>
+              <option value="Tutor">Tutor</option>
+              <option value="Administrador">Administrador</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ciclo (Opcional)</label>
+            <input type="text" id="user-ciclo" class="form-input" placeholder="Ej: VIII">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Estado</label>
+            <select id="user-state" class="form-select" required>
+              <option value="Activo">Activo</option>
+              <option value="Inactivo">Inactivo</option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-gray" onclick="closeUserModal()">Cancelar</button>
+        <button class="btn btn-blue" id="btn-save-user" onclick="saveUser()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  
+  <script src="js/app.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Panel de Tutor - SGTA-UPLA">
+  <title>SGTA-UPLA | Panel de Tutor</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="dashboard">
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand">
+          <div class="sidebar-brand-icon" id="sidebar-icon"></div>
+          <div class="sidebar-brand-text">
+            <h2>Panel Tutor</h2>
+            <p>SGTA-UPLA</p>
+          </div>
+        </div>
+      </div>
+      <nav class="sidebar-nav"><div class="sidebar-menu" id="sidebar-menu"></div></nav>
+      <div class="sidebar-footer">
+        <button id="logout-btn" class="logout-btn">
+          <span id="logout-icon"></span>
+          <span class="logout-text">Cerrar Sesión</span>
+        </button>
+      </div>
+    </aside>
+
+    <div class="main-wrapper">
+      <header class="header">
+        <div class="header-inner">
+          <div class="header-left">
+            <button id="toggle-sidebar" class="toggle-sidebar-btn"></button>
+            <div class="search-box">
+              <span id="search-icon"></span>
+              <input type="text" placeholder="Buscar estudiantes, tutorías...">
+            </div>
+          </div>
+          <div class="header-right">
+            <button class="notification-btn"><span id="bell-icon"></span><span class="notification-dot"></span></button>
+            <div class="user-info">
+              <div class="user-info-text">
+                <p class="user-name">Dr. Carlos Mendoza</p>
+                <p class="user-role">Tutor</p>
+              </div>
+              <div class="user-avatar avatar-tutor"><span>CM</span></div>
+            </div>
+          </div>
+        </div>
+      </header>
+      <main class="main-content" id="main-content"></main>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  
+  <script src="js/app.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/tutor.js"></script>
+</body>
+</html>
