@@ -70,6 +70,8 @@
               <div class="input-wrapper">
                 <span id="icon-lock"></span>
                 <input type="password" id="password" placeholder="••••••••" required>
+                <button type="button" class="password-toggle" id="toggle-password"
+                  title="Mostrar/ocultar contraseña"></button>
               </div>
             </div>
 
@@ -82,6 +84,13 @@
                   <option value="Administrador">Administrador</option>
                 </select>
                 <span class="chevron-icon" id="icon-chevron"></span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div class="remember-row">
+                <input type="checkbox" id="remember-session" checked>
+                <label for="remember-session">Recordar sesión</label>
               </div>
             </div>
 
@@ -100,14 +109,57 @@
     </div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <!-- Modal: Recuperar Contraseña -->
+  <div id="forgot-modal-overlay" class="forgot-modal-overlay">
+    <div class="forgot-modal">
+      <h3>Recuperar Contraseña</h3>
+      <p>Ingresa tu correo institucional y te enviaremos un enlace para restablecer tu contraseña.</p>
+      <div class="form-group">
+        <label class="form-label">Correo Electrónico</label>
+        <input type="email" id="forgot-email" class="form-input" placeholder="correo@upla.edu.pe">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-gray" id="forgot-cancel">Cancelar</button>
+        <button class="btn btn-blue" id="forgot-send">Enviar Enlace</button>
+      </div>
+    </div>
+  </div>
 
+  <!-- Modal: Verificación de Nuevo Dispositivo -->
+  <div id="device-modal-overlay" class="forgot-modal-overlay">
+    <div class="forgot-modal">
+      <h3>Autorizar Nuevo Dispositivo</h3>
+      <p>Al ser la primera vez que ingresas desde este dispositivo con esta cuenta, por seguridad hemos enviado un
+        código de verificación de 6 dígitos a tu correo (<strong id="device-email-display">correo@upla.edu.pe</strong>).
+      </p>
+      <div class="form-group">
+        <label class="form-label">Código de Verificación</label>
+        <input type="text" id="device-otp-input" class="form-input" placeholder="123456" maxlength="6"
+          style="letter-spacing: 0.3em; text-align: center; font-weight: 600; font-size: 1.25rem;">
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-gray" id="device-cancel">Cancelar</button>
+        <button class="btn btn-blue" id="device-verify">Verificar y Entrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+  <!-- EmailJS SDK (opcional) -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <!-- App Modules -->
   <script src="js/app.js"></script>
   <script src="js/firebase-config.js"></script>
-
+  <script src="js/validators.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/email-service.js"></script>
   <script src="js/login.js"></script>
-
 
 </body>
 

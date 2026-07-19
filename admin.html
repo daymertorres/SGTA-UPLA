@@ -66,7 +66,7 @@
     </div>
   </div>
 
-  <!-- Modal Container -->
+  <!-- Modal: Crear/Editar Usuario -->
   <div id="modal-overlay" class="modal-overlay">
     <div class="modal">
       <div class="modal-header">
@@ -86,7 +86,10 @@
           </div>
           <div class="form-group">
             <label class="form-label">Contraseña</label>
-            <input type="password" id="user-password" class="form-input" placeholder="Para nuevos usuarios" required>
+            <div style="position: relative;">
+              <input type="password" id="user-password" class="form-input" placeholder="Para nuevos usuarios" required style="padding-right: 2.5rem;">
+              <button type="button" class="password-toggle" id="toggle-user-password" title="Mostrar/ocultar contraseña" style="position: absolute; right: 0.5rem; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: var(--gray-500);"></button>
+            </div>
           </div>
           <div class="form-group">
             <label class="form-label">Rol</label>
@@ -99,6 +102,10 @@
           <div class="form-group">
             <label class="form-label">Ciclo (Opcional)</label>
             <input type="text" id="user-ciclo" class="form-input" placeholder="Ej: VIII">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Especialidad (Tutores)</label>
+            <input type="text" id="user-especialidad" class="form-input" placeholder="Ej: Matemáticas">
           </div>
           <div class="form-group">
             <label class="form-label">Estado</label>
@@ -116,11 +123,92 @@
     </div>
   </div>
 
+  <!-- Modal: Crear/Editar Tutoría -->
+  <div id="tutoria-modal-overlay" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="tutoria-modal-title">Crear Tutoría</h2>
+        <button class="modal-close" onclick="closeTutoriaModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="tutoria-form" class="form-grid">
+          <input type="hidden" id="tutoria-id">
+          <div class="form-group">
+            <label class="form-label">Estudiante</label>
+            <select id="tutoria-estudiante" class="form-select" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tutor</label>
+            <select id="tutoria-tutor" class="form-select" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Materia</label>
+            <input type="text" id="tutoria-materia" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fecha</label>
+            <input type="date" id="tutoria-fecha" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Hora</label>
+            <input type="time" id="tutoria-hora" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duración</label>
+            <select id="tutoria-duracion" class="form-select">
+              <option value="30 minutos">30 minutos</option>
+              <option value="1 hora" selected>1 hora</option>
+              <option value="1.5 horas">1.5 horas</option>
+              <option value="2 horas">2 horas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ubicación</label>
+            <select id="tutoria-ubicacion" class="form-select">
+              <option>Virtual</option>
+              <option>Sala 201</option>
+              <option>Sala 305</option>
+              <option>Laboratorio 3</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Estado</label>
+            <select id="tutoria-estado" class="form-select">
+              <option value="Pendiente">Pendiente</option>
+              <option value="Aceptada">Aceptada</option>
+              <option value="Rechazada">Rechazada</option>
+              <option value="Finalizada">Finalizada</option>
+              <option value="Cancelada">Cancelada</option>
+            </select>
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label class="form-label">Observaciones</label>
+            <textarea id="tutoria-observaciones" class="form-textarea" placeholder="Observaciones de la tutoría..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-gray" onclick="closeTutoriaModal()">Cancelar</button>
+        <button class="btn btn-blue" id="btn-save-tutoria" onclick="saveTutoria()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+
+  <!-- EmailJS SDK -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <!-- App Modules -->
   <script src="js/app.js"></script>
   <script src="js/firebase-config.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/email-service.js"></script>
   <script src="js/admin.js"></script>
 </body>
 </html>

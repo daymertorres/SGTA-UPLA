@@ -35,17 +35,17 @@
             <button id="toggle-sidebar" class="toggle-sidebar-btn"></button>
             <div class="search-box">
               <span id="search-icon"></span>
-              <input type="text" placeholder="Buscar estudiantes, tutorías...">
+              <input type="text" id="search-input" placeholder="Buscar estudiantes, tutorías...">
             </div>
           </div>
           <div class="header-right">
             <button class="notification-btn"><span id="bell-icon"></span><span class="notification-dot"></span></button>
             <div class="user-info">
               <div class="user-info-text">
-                <p class="user-name">Dr. Carlos Mendoza</p>
+                <p class="user-name">Tutor</p>
                 <p class="user-role">Tutor</p>
               </div>
-              <div class="user-avatar avatar-tutor"><span>CM</span></div>
+              <div class="user-avatar avatar-tutor"><span>T</span></div>
             </div>
           </div>
         </div>
@@ -54,11 +54,167 @@
     </div>
   </div>
 
+  <!-- Modal: Programar Tutoría -->
+  <div id="tutor-tutoria-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="tutor-modal-title">Programar Tutoría</h2>
+        <button class="modal-close" onclick="closeTutorTutoriaModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="tutor-tutoria-form" class="form-grid">
+          <input type="hidden" id="tt-id">
+          <div class="form-group">
+            <label class="form-label">Estudiante</label>
+            <select id="tt-estudiante" class="form-select" required></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Materia</label>
+            <select id="tt-materia" class="form-select" required>
+              <option value="">Seleccionar materia...</option>
+              <option>Cálculo Diferencial</option>
+              <option>Cálculo Integral</option>
+              <option>Álgebra Lineal</option>
+              <option>Ecuaciones Diferenciales</option>
+              <option>Programación Java</option>
+              <option>Base de Datos</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fecha</label>
+            <input type="date" id="tt-fecha" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Hora</label>
+            <input type="time" id="tt-hora" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Duración</label>
+            <select id="tt-duracion" class="form-select">
+              <option>30 minutos</option>
+              <option selected>1 hora</option>
+              <option>1.5 horas</option>
+              <option>2 horas</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ubicación</label>
+            <select id="tt-ubicacion" class="form-select">
+              <option>Virtual</option>
+              <option>Sala 201</option>
+              <option>Sala 305</option>
+              <option>Laboratorio 3</option>
+            </select>
+          </div>
+          <div class="form-group" style="grid-column: span 2;">
+            <label class="form-label">Notas / Temario</label>
+            <textarea id="tt-notas" class="form-textarea" placeholder="Describe los temas a tratar..."></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-gray" onclick="closeTutorTutoriaModal()">Cancelar</button>
+        <button class="btn btn-blue" id="btn-save-tt" onclick="saveTutorTutoria()">Programar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Control de Asistencia de Salón -->
+  <div id="asistencia-salon-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 720px; width: 95%;">
+      <div class="modal-header" style="border-bottom: 1px solid var(--gray-200); padding-bottom: 1rem;">
+        <div>
+          <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--gray-900);">Control de Asistencia de Salón</h2>
+          <p id="asist-mode-lbl" class="text-xs mt-1" style="color: var(--blue-600); font-weight: 600;">📋 Cargando información de la sesión...</p>
+        </div>
+        <button class="modal-close" onclick="closeAsistenciaSalonModal()">&times;</button>
+      </div>
+      <div class="modal-body" style="padding-top: 1rem;">
+        <input type="hidden" id="asist-tutoria-id">
+        
+        <!-- Tutoria Info Banner -->
+        <div id="asist-tutoria-banner" style="background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%); color: white; padding: 1rem; border-radius: var(--radius-lg); margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem; box-shadow: var(--shadow-sm);">
+          <div>
+            <p class="text-xs" style="color: #bfdbfe; text-transform: uppercase; letter-spacing: 0.05em;">Sesión de Tutoría</p>
+            <h3 id="asist-materia-title" class="text-lg font-bold" style="color: white; margin-top: 0.2rem;">Materia General</h3>
+            <p id="asist-delegado-sub" class="text-xs" style="color: #e2e8f0; margin-top: 0.2rem;">🧑‍🎓 Estudiante / Delegado: Cargando...</p>
+          </div>
+          <div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(4px); padding: 0.5rem 0.8rem; border-radius: var(--radius-md); text-align: right;">
+            <p class="text-xs" style="color: #bfdbfe;">Salón / Ciclo</p>
+            <strong id="asist-ciclo-lbl" class="text-sm" style="color: white;">General</strong>
+          </div>
+        </div>
+
+        <!-- Live Stats Counters Bar -->
+        <div style="background: var(--gray-50); border: 1px solid var(--gray-200); padding: 0.6rem 1rem; border-radius: var(--radius-md); margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+          <div style="display: flex; gap: 1rem; font-size: 0.8rem; font-weight: 600;">
+            <span style="color: var(--green-600);" id="live-asist-count">🟢 Presentes: 0</span>
+            <span style="color: var(--red-600);" id="live-falta-count">🔴 Faltas: 0</span>
+            <span style="color: var(--yellow-700);" id="live-just-count">🟡 Justificados: 0</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span class="text-xs text-gray-500">Filtrar Salón:</span>
+            <select id="asist-ciclo-filter" class="form-select" style="padding: 0.2rem 0.5rem; font-size: 0.8rem; width: auto;" onchange="loadAsistenciaSalonList(this.value)">
+              <option value="">Automático (Salón del Delegado)</option>
+              <option value="I">Ciclo I</option>
+              <option value="II">Ciclo II</option>
+              <option value="III">Ciclo III</option>
+              <option value="IV">Ciclo IV</option>
+              <option value="V">Ciclo V</option>
+              <option value="VI">Ciclo VI</option>
+              <option value="VII">Ciclo VII</option>
+              <option value="VIII">Ciclo VIII</option>
+              <option value="IX">Ciclo IX</option>
+              <option value="X">Ciclo X</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; flex-wrap: wrap; gap: 0.5rem;">
+          <p class="text-xs text-gray-600 font-medium">Acciones rápidas para todo el salón:</p>
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            <button type="button" class="btn btn-sm" style="background: var(--green-500); color: white; font-weight: 600; box-shadow: var(--shadow-sm);" onclick="setAllAsistencia('Asistencia')">✅ Todos Presentes</button>
+            <button type="button" class="btn btn-sm" style="background: var(--red-500); color: white; font-weight: 600; box-shadow: var(--shadow-sm);" onclick="setAllAsistencia('Falta')">❌ Todos Falta</button>
+            <button type="button" class="btn btn-sm" style="background: var(--amber-500); color: white; font-weight: 600; box-shadow: var(--shadow-sm);" onclick="setAllAsistencia('Justificación')">📝 Todos Justificado</button>
+          </div>
+        </div>
+
+        <div class="table-responsive" style="max-height: 360px; overflow-y: auto; border: 1px solid var(--gray-200); border-radius: var(--radius-md);">
+          <table class="table" style="margin: 0;">
+            <thead style="position: sticky; top: 0; background: #fff; z-index: 2; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+              <tr>
+                <th style="width: 100px;">Código</th>
+                <th>Estudiante</th>
+                <th style="width: 80px;">Ciclo</th>
+                <th>Estado de Asistencia</th>
+              </tr>
+            </thead>
+            <tbody id="asist-salon-list">
+              <tr><td colspan="4" style="text-align: center; padding: 2rem;">Cargando estudiantes del salón...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-gray" onclick="closeAsistenciaSalonModal()">Cancelar</button>
+        <button class="btn btn-blue" id="btn-save-asist-salon" onclick="saveAsistenciaSalon()">Guardar Asistencia</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+
+  <!-- App Modules -->
   <script src="js/app.js"></script>
   <script src="js/firebase-config.js"></script>
+  <script src="js/validators.js"></script>
+  <script src="js/notifications.js"></script>
+  <script src="js/email-service.js"></script>
   <script src="js/tutor.js"></script>
 </body>
 </html>
