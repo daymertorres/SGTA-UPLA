@@ -1,6 +1,6 @@
 /* ============================================
    SGTA-UPLA — App Utilities
-   Shared functions and SVG icon rendering
+   Shared functions, icons, auth, and UI helpers
    ============================================ */
 
 /**
@@ -40,7 +40,12 @@ const Icons = {
   'chevron-left': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>',
   'chevron-right': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>',
   'phone': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',
-  'trash-2': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>'
+  'trash-2': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>',
+  'edit': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>',
+  'eye': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>',
+  'eye-off': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/></svg>',
+  'download': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>',
+  'refresh': '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>'
 };
 
 /**
@@ -54,7 +59,8 @@ function icon(name) {
  * Get initials from a full name
  */
 function getInitials(name) {
-  return name.split(' ').map(n => n[0]).join('');
+  if (!name) return '??';
+  return name.split(' ').filter(n => n.length > 0).map(n => n[0]).join('').substring(0, 2).toUpperCase();
 }
 
 /**
@@ -65,13 +71,18 @@ function getBadgeClass(value) {
     'Activo': 'badge-green',
     'Inactivo': 'badge-gray',
     'Completada': 'badge-green',
+    'Finalizada': 'badge-green',
     'Confirmada': 'badge-green',
+    'Aceptada': 'badge-green',
     'Programada': 'badge-blue',
     'Pendiente': 'badge-amber',
     'Cancelada': 'badge-red',
+    'Rechazada': 'badge-red',
     'Aprobada': 'badge-green',
     'Tutor': 'badge-green',
     'Delegado': 'badge-purple',
+    'Estudiante Delegado': 'badge-purple',
+    'Administrador': 'badge-blue',
     'Estudiante': 'badge-blue',
     'Alta': 'badge-red',
     'Media': 'badge-amber',
@@ -109,14 +120,52 @@ function setupSidebar() {
 
   if (!toggleBtn || !sidebar) return;
 
+  // Create backdrop for mobile if not present
+  let backdrop = document.getElementById('mobile-sidebar-backdrop');
+  if (!backdrop) {
+    backdrop = document.createElement('div');
+    backdrop.id = 'mobile-sidebar-backdrop';
+    backdrop.className = 'mobile-sidebar-backdrop';
+    document.body.appendChild(backdrop);
+    backdrop.addEventListener('click', () => {
+      sidebar.classList.remove('mobile-open');
+      backdrop.classList.remove('active');
+      toggleBtn.innerHTML = icon('menu');
+    });
+  }
+
+  const handleResize = () => {
+    if (window.innerWidth <= 1024) {
+      if (!sidebar.classList.contains('mobile-open')) {
+        toggleBtn.innerHTML = icon('menu');
+      }
+      if (mainWrapper) mainWrapper.style.marginLeft = '0px';
+    } else {
+      backdrop.classList.remove('active');
+      sidebar.classList.remove('mobile-open');
+      const isCollapsed = sidebar.classList.contains('collapsed');
+      toggleBtn.innerHTML = isCollapsed ? icon('menu') : icon('x');
+      if (mainWrapper) {
+        mainWrapper.style.marginLeft = isCollapsed ? 'var(--sidebar-collapsed)' : 'var(--sidebar-width)';
+      }
+    }
+  };
+
+  window.addEventListener('resize', handleResize);
+  handleResize();
+
   toggleBtn.addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
-    // Update icon
-    const isCollapsed = sidebar.classList.contains('collapsed');
-    toggleBtn.innerHTML = isCollapsed ? icon('menu') : icon('x');
-    // Update main wrapper margin
-    if (mainWrapper) {
-      mainWrapper.style.marginLeft = isCollapsed ? 'var(--sidebar-collapsed)' : 'var(--sidebar-width)';
+    if (window.innerWidth <= 1024) {
+      const isOpen = sidebar.classList.toggle('mobile-open');
+      backdrop.classList.toggle('active', isOpen);
+      toggleBtn.innerHTML = isOpen ? icon('x') : icon('menu');
+    } else {
+      sidebar.classList.toggle('collapsed');
+      const isCollapsed = sidebar.classList.contains('collapsed');
+      toggleBtn.innerHTML = isCollapsed ? icon('menu') : icon('x');
+      if (mainWrapper) {
+        mainWrapper.style.marginLeft = isCollapsed ? 'var(--sidebar-collapsed)' : 'var(--sidebar-width)';
+      }
     }
   });
 }
@@ -125,47 +174,252 @@ function setupSidebar() {
  * Setup menu navigation
  */
 function setupNavigation() {
+  const sidebar = document.getElementById('sidebar');
+  const backdrop = document.getElementById('mobile-sidebar-backdrop');
+  const toggleBtn = document.getElementById('toggle-sidebar');
+
   document.querySelectorAll('.menu-item').forEach(item => {
     item.addEventListener('click', () => {
       const sectionId = item.dataset.section;
       navigateSection(sectionId);
+
+      // Auto close sidebar on mobile when navigating
+      if (window.innerWidth <= 1024 && sidebar && sidebar.classList.contains('mobile-open')) {
+        sidebar.classList.remove('mobile-open');
+        if (backdrop) backdrop.classList.remove('active');
+        if (toggleBtn) toggleBtn.innerHTML = icon('menu');
+      }
     });
   });
 }
 
 /**
- * Setup logout
+ * Setup logout with Firebase Auth
  */
 function setupLogout() {
   const logoutBtn = document.getElementById('logout-btn');
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', () => {
-      localStorage.removeItem('sgta_session');
-      window.location.href = 'index.html';
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await signOutUser();
+        window.location.href = 'index.html';
+      } catch (err) {
+        console.error('Error al cerrar sesión:', err);
+        localStorage.removeItem('sgta_session');
+        window.location.href = 'index.html';
+      }
     });
   }
 }
 
 /**
- * Check if user is logged in
+ * Check authentication using Firebase Auth + Firestore role validation
+ * Returns the user data from Firestore or redirects
+ * @param {string} requiredRole - Rol requerido para acceder
+ * @returns {Object|null} Datos del usuario
  */
 function checkAuth(requiredRole) {
+  // Verificar sesión local primero (para carga rápida)
   const session = JSON.parse(localStorage.getItem('sgta_session') || 'null');
   if (!session) {
     window.location.href = 'index.html';
     return null;
   }
+
+  // Verificar rol
   if (requiredRole && session.role !== requiredRole) {
-    if (session.role === 'Administrador') {
-      window.location.href = 'admin.html';
-    } else if (session.role === 'Tutor') {
-      window.location.href = 'tutor.html';
-    } else {
-      window.location.href = 'student.html';
-    }
+    redirectByRole(session.role);
     return null;
   }
+
+  // Verificación async de Firebase Auth (en background)
+  if (typeof onAuthChange === 'function') {
+    onAuthChange((firebaseUser) => {
+      if (!firebaseUser) {
+        // Firebase Auth no tiene sesión, limpiar y redirigir
+        localStorage.removeItem('sgta_session');
+        window.location.href = 'index.html';
+      }
+    });
+  }
+
   return session;
+}
+
+/**
+ * Redirigir según rol del usuario
+ * @param {string} role
+ */
+function redirectByRole(role) {
+  switch (role) {
+    case 'Administrador':
+      window.location.href = 'admin.html';
+      break;
+    case 'Tutor':
+      window.location.href = 'tutor.html';
+      break;
+    case 'Estudiante Delegado':
+    default:
+      window.location.href = 'student.html';
+      break;
+  }
+}
+
+/**
+ * Setup user info in header (name, avatar, role)
+ * @param {Object} session - Session data
+ */
+function setupUserInfo(session) {
+  if (!session) return;
+
+  // Actualizar nombre
+  const nameEl = document.querySelector('.user-name');
+  if (nameEl) nameEl.textContent = session.nombre || session.email || 'Usuario';
+
+  // Actualizar rol
+  const roleEl = document.querySelector('.user-role');
+  if (roleEl) roleEl.textContent = session.role || '';
+
+  // Actualizar avatar con iniciales
+  const avatarEl = document.querySelector('.user-avatar');
+  if (avatarEl) {
+    const initials = getInitials(session.nombre || session.email);
+    avatarEl.innerHTML = `<span>${initials}</span>`;
+  }
+
+  // Actualizar sidebar brand text si tiene ciclo
+  if (session.ciclo) {
+    const brandSubtext = document.querySelector('.sidebar-brand-text p');
+    if (brandSubtext && session.role === 'Estudiante Delegado') {
+      brandSubtext.textContent = `Delegado - Ciclo ${session.ciclo}`;
+    }
+  }
+}
+
+/**
+ * Mostrar overlay de carga global
+ * @param {string} message - Mensaje opcional
+ */
+function showLoader(message = 'Cargando...') {
+  let loader = document.getElementById('global-loader');
+  if (!loader) {
+    loader = document.createElement('div');
+    loader.id = 'global-loader';
+    loader.className = 'global-loader';
+    loader.innerHTML = `
+      <div class="loader-content">
+        <div class="loader-spinner"></div>
+        <p class="loader-text">${Validators.sanitize(message)}</p>
+      </div>
+    `;
+    document.body.appendChild(loader);
+  } else {
+    const textEl = loader.querySelector('.loader-text');
+    if (textEl) textEl.textContent = message;
+    loader.style.display = 'flex';
+  }
+}
+
+/**
+ * Ocultar overlay de carga global
+ */
+function hideLoader() {
+  const loader = document.getElementById('global-loader');
+  if (loader) loader.style.display = 'none';
+}
+
+/**
+ * Deshabilitar/habilitar un botón con estado de carga
+ * @param {HTMLButtonElement} btn
+ * @param {boolean} loading
+ * @param {string} loadingText
+ */
+function setButtonLoading(btn, loading, loadingText = 'Procesando...') {
+  if (!btn) return;
+  if (loading) {
+    btn._originalText = btn.textContent;
+    btn.textContent = loadingText;
+    btn.disabled = true;
+    btn.classList.add('btn-loading');
+  } else {
+    btn.textContent = btn._originalText || btn.textContent;
+    btn.disabled = false;
+    btn.classList.remove('btn-loading');
+  }
+}
+
+/**
+ * Formatear fecha Firestore timestamp a string legible
+ * @param {Object|string} timestamp
+ * @returns {string}
+ */
+function formatDate(timestamp) {
+  if (!timestamp) return '-';
+  let date;
+  if (timestamp.toDate) {
+    date = timestamp.toDate();
+  } else if (typeof timestamp === 'string') {
+    date = new Date(timestamp);
+  } else {
+    date = new Date(timestamp);
+  }
+  if (isNaN(date.getTime())) return timestamp;
+  return date.toLocaleDateString('es-PE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+
+/**
+ * Setup search functionality for tables
+ * @param {string} inputId - ID del input de búsqueda
+ * @param {string} tbodyId - ID del tbody a filtrar
+ */
+function setupTableSearch(inputId, tbodyId) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+
+  input.addEventListener('input', () => {
+    const query = input.value.toLowerCase().trim();
+    const tbody = document.getElementById(tbodyId);
+    if (!tbody) return;
+
+    const rows = tbody.querySelectorAll('tr');
+    rows.forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(query) ? '' : 'none';
+    });
+  });
+}
+
+/**
+ * Render pagination controls
+ * @param {{ currentPage: number, totalPages: number, onPageChange: Function }} config
+ * @returns {string} HTML de paginación
+ */
+function renderPagination(config) {
+  const { currentPage, totalPages, containerId } = config;
+  if (totalPages <= 1) return '';
+
+  let pages = '';
+  const maxVisible = 5;
+  let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+  let end = Math.min(totalPages, start + maxVisible - 1);
+  if (end - start + 1 < maxVisible) start = Math.max(1, end - maxVisible + 1);
+
+  for (let i = start; i <= end; i++) {
+    pages += `<button class="pagination-btn ${i === currentPage ? 'pagination-active' : ''}" data-page="${i}">${i}</button>`;
+  }
+
+  return `
+    <div class="pagination" id="${containerId || 'pagination'}">
+      <button class="pagination-btn" data-page="${currentPage - 1}" ${currentPage <= 1 ? 'disabled' : ''}>
+        ${icon('chevron-left')}
+      </button>
+      ${pages}
+      <button class="pagination-btn" data-page="${currentPage + 1}" ${currentPage >= totalPages ? 'disabled' : ''}>
+        ${icon('chevron-right')}
+      </button>
+      <span class="pagination-info">Página ${currentPage} de ${totalPages}</span>
+    </div>
+  `;
 }
 
 /**
@@ -176,3 +430,121 @@ function initDashboard() {
   setupNavigation();
   setupLogout();
 }
+
+/**
+ * SEED DEMO DATA — Carga masiva de Estudiantes Delegados, Tutores, Compañeros y Tutorías
+ */
+window.seedDemoData = async function() {
+  if (!confirm('¿Deseas poblar la base de datos de Firestore con múltiples Estudiantes Delegados, Tutores, Compañeros de Salón y Tutorías de prueba?')) {
+    return;
+  }
+
+  try {
+    Notifications.info('⏳ Generando y guardando datos de prueba en Firestore... por favor espera unos segundos.');
+
+    const delegadosData = [
+      { nombre: 'Carlos Mendoza Ríos', email: 'carlos.mendoza@upla.edu.pe', rol: 'Estudiante Delegado', ciclo: 'VI', estado: 'Activo' },
+      { nombre: 'Lucía Fernández Gómez', email: 'lucia.fernandez@upla.edu.pe', rol: 'Estudiante Delegado', ciclo: 'IV', estado: 'Activo' },
+      { nombre: 'Kevin Torres Salazar', email: 'kevin.torres@upla.edu.pe', rol: 'Estudiante Delegado', ciclo: 'VIII', estado: 'Activo' },
+      { nombre: 'Valeria Rojas Flores', email: 'valeria.rojas@upla.edu.pe', rol: 'Estudiante Delegado', ciclo: 'V', estado: 'Activo' },
+      { nombre: 'Diego Paredes Castro', email: 'diego.paredes@upla.edu.pe', rol: 'Estudiante Delegado', ciclo: 'VII', estado: 'Activo' },
+      { nombre: 'Sofía Vargas Ortiz', email: 'sofia.vargas@upla.edu.pe', rol: 'Estudiante Delegado', ciclo: 'IX', estado: 'Activo' }
+    ];
+
+    const tutoresData = [
+      { nombre: 'Dr. Jorge Álvarez Ramírez', email: 'jorge.alvarez@upla.edu.pe', rol: 'Tutor', especialidad: 'Matemáticas y Cálculo Avanzado', estado: 'Activo' },
+      { nombre: 'Mg. Elena Cárdenas Silva', email: 'elena.cardenas@upla.edu.pe', rol: 'Tutor', especialidad: 'Ingeniería de Software y Arquitectura', estado: 'Activo' },
+      { nombre: 'Ing. Roberto Quispe Mamani', email: 'roberto.quispe@upla.edu.pe', rol: 'Tutor', especialidad: 'Base de Datos y Cloud Computing', estado: 'Activo' },
+      { nombre: 'Dra. Patricia Huamán López', email: 'patricia.huaman@upla.edu.pe', rol: 'Tutor', especialidad: 'Física General y Aplicada', estado: 'Activo' },
+      { nombre: 'Mg. Fernando Benavides Cruz', email: 'fernando.benavides@upla.edu.pe', rol: 'Tutor', especialidad: 'Algoritmos y Estructura de Datos', estado: 'Activo' },
+      { nombre: 'Ing. Mariana Solís Ramos', email: 'mariana.solis@upla.edu.pe', rol: 'Tutor', especialidad: 'Inteligencia Artificial y Python', estado: 'Activo' }
+    ];
+
+    const delegadosGuardados = [];
+    for (const del of delegadosData) {
+      del.uid = 'del_' + Math.random().toString(36).substring(2, 9);
+      del.fechaRegistro = new Date().toISOString();
+      const ref = await addDocument('usuarios', del);
+      delegadosGuardados.push({ ...del, id: ref ? ref.id : del.uid });
+    }
+
+    const tutoresGuardados = [];
+    for (const tut of tutoresData) {
+      tut.uid = 'tut_' + Math.random().toString(36).substring(2, 9);
+      tut.fechaRegistro = new Date().toISOString();
+      const ref = await addDocument('usuarios', tut);
+      tutoresGuardados.push({ ...tut, id: ref ? ref.id : tut.uid });
+    }
+
+    // Compañeros por cada Delegado (Aislamiento total por delegado)
+    const nombresCompaneros = [
+      ['Mateo García', 'Camila Torres', 'Adrián Navarro', 'Jimena López', 'Raúl Castro', 'Gabriela Ruiz', 'Esteban Poma'],
+      ['Gabriel Silva', 'Mariana Cruz', 'Daniel Quispe', 'Andrea Poma', 'Joaquín Santos', 'Paula Herrera', 'Sebastián Mora'],
+      ['Ricardo Miranda', 'Juliana Bravo', 'Esteban Ramos', 'Martina Peña', 'Hernán Díaz', 'Lorena León', 'Guillermo Vega'],
+      ['Rodrigo Salas', 'Claudia Mendoza', 'Felipe Ortiz', 'Rosa Guzmán', 'Emilio Rivas', 'Victoria Flores', 'Hugo Sánchez'],
+      ['Ignacio Soto', 'Daniela Ríos', 'Bruno Campos', 'Alejandra Paz', 'Marco Tulio', 'Ximena Córdoba', 'Óscar Linares'],
+      ['Manuel Arce', 'Natalia Vera', 'Andrés Cueva', 'Inés Morales', 'Héctor Franco', 'Mónica Peña', 'Enrique Silva']
+    ];
+
+    for (let i = 0; i < delegadosGuardados.length; i++) {
+      const del = delegadosGuardados[i];
+      const listaNombres = nombresCompaneros[i] || nombresCompaneros[0];
+      for (let j = 0; j < listaNombres.length; j++) {
+        const compData = {
+          codigo: `202${i+1}100${j+1}`,
+          nombre: listaNombres[j],
+          email: `${listaNombres[j].toLowerCase().replace(/\s+/g, '.')}@upla.edu.pe`,
+          ciclo: del.ciclo || 'VI',
+          delegadoId: del.uid,
+          delegadoNombre: del.nombre,
+          asistencias: Math.floor(Math.random() * 8) + 2,
+          faltas: Math.floor(Math.random() * 2),
+          justificaciones: Math.floor(Math.random() * 2),
+          totalSesiones: 10,
+          createdAt: new Date().toISOString()
+        };
+        await addDocument('estudiantes_salon', compData);
+      }
+    }
+
+    // Tutorías variadas (Aceptadas, Finalizadas, Pendientes, Canceladas)
+    const materiasPorTutor = [
+      'Cálculo Multivariable', 'Diseño de Sistemas Web', 'Normalización SQL Avanzada',
+      'Electromagnetismo y Mecánica', 'Árboles y Grafos C++', 'Redes Neuronales Deep Learning'
+    ];
+
+    for (let i = 0; i < 14; i++) {
+      const delIndex = i % delegadosGuardados.length;
+      const tutIndex = (i * 2 + 1) % tutoresGuardados.length;
+      const del = delegadosGuardados[delIndex];
+      const tut = tutoresGuardados[tutIndex];
+      const materia = materiasPorTutor[tutIndex] || 'Asesoría Académica General';
+
+      const estados = ['Aceptada', 'Finalizada', 'Pendiente', 'Aceptada', 'Finalizada', 'Cancelada'];
+      const tutoriaData = {
+        estudiante: del.nombre,
+        estudianteId: del.uid,
+        delegadoId: del.uid,
+        ciclo: del.ciclo || 'VI',
+        tutor: tut.nombre,
+        tutorId: tut.uid,
+        materia: materia,
+        fecha: `2026-07-${10 + (i % 15)}`,
+        hora: `${9 + (i % 8)}:00`,
+        duracion: '1h',
+        ubicacion: i % 2 === 0 ? 'Virtual - Google Meet' : `Aula ${201 + i} - Campus Principal`,
+        estado: estados[i % estados.length],
+        createdAt: new Date().toISOString()
+      };
+      await addDocument('tutorias', tutoriaData);
+    }
+
+    Notifications.success('🎉 ¡Datos de prueba cargados exitosamente! Se agregaron 6 Delegados, 6 Tutores, 42 Compañeros y 14 Tutorías.');
+    setTimeout(() => {
+      window.location.reload();
+    }, 1500);
+  } catch (err) {
+    console.error('Error durante la carga de datos (seed):', err);
+    Notifications.error('Hubo un error al generar los datos de prueba en Firestore.');
+  }
+};
