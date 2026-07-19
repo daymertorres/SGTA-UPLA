@@ -1212,7 +1212,7 @@ function buildInicio() {
             <h2 class="mb-4">Acciones Rápidas</h2>
             <div class="quick-actions">
               <button class="quick-action-btn qa-blue" onclick="openUserModal()">${icon('user-cog')}<p>Crear Usuario</p></button>
-              <button class="quick-action-btn qa-green" onclick="window.seedDemoData()">${icon('database')}<p>Seed Datos</p></button>
+              <button class="quick-action-btn qa-green" onclick="navigateSection('tutores')">${icon('user-circle')}<p>Ver Tutores</p></button>
               <button class="quick-action-btn qa-purple" onclick="openTutoriaModal()">${icon('book-open')}<p>Nueva Tutoría</p></button>
               <button class="quick-action-btn qa-amber" onclick="navigateSection('reportes')">${icon('bar-chart-3')}<p>Ver Reportes</p></button>
             </div>
@@ -1232,7 +1232,7 @@ function buildGestionUsuarios() {
         <p>Administrar todos los usuarios del sistema</p>
       </div>
       <div class="card">
-        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.75rem;">
+        <div class="card-header">
           <div class="flex items-center gap-4">
             <h2>Lista de Usuarios</h2>
             <select class="filter-select" id="filter-users-role">
@@ -1242,10 +1242,7 @@ function buildGestionUsuarios() {
               <option>Administradores</option>
             </select>
           </div>
-          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
-            <button class="btn btn-sm" style="background:var(--green-500);color:white;font-weight:600;" onclick="window.seedDemoData()">🌱 Poblar Datos de Prueba</button>
-            <button class="btn btn-blue" onclick="openUserModal()">${icon('user-cog')} Crear Usuario</button>
-          </div>
+          <button class="btn btn-blue" onclick="openUserModal()">${icon('user-cog')} Crear Usuario</button>
         </div>
         <div class="table-wrapper">
           <table>
