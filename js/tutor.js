@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
     { icon: 'calendar-check', label: 'Programar Tutoría', section: 'programar', badge: null },
     { icon: 'users', label: 'Mis Estudiantes', section: 'mis-estudiantes', badge: null },
     { icon: 'file-text', label: 'Solicitudes', section: 'solicitudes', badge: null },
-    { icon: 'message-square', label: 'Mensajes', section: 'mensajes', badge: null },
+
     { icon: 'settings', label: 'Configuración', section: 'configuracion', badge: null }
   ];
 
@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ${buildProgramar()}
     ${buildMisEstudiantes()}
     ${buildSolicitudes()}
-    ${buildMensajes()}
+
     ${buildTutorConfig(session)}
   `;
 
@@ -69,7 +69,7 @@ async function initTutorData(session) {
       loadTutorTutorias(tutorName),
       loadTutorEstudiantes(tutorName),
       loadTutorSolicitudes(tutorName),
-      loadTutorMensajes(session)
+
     ]);
 
     // Load tutor materias for programar form
@@ -962,7 +962,7 @@ function buildMisTutorias() {
             <button class="btn btn-blue" onclick="openTutorTutoriaModal()">Programar Nueva</button>
           </div>
         </div>
-        <div class="table-wrapper"><table><thead><tr><th>ID</th><th>Estudiante</th><th>Materia</th><th>Fecha</th><th>Horario</th><th>Ubicación</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tutor-tutorias-list"><tr><td colspan="8" style="text-align:center;padding:2rem;">Cargando tutorías...</td></tr></tbody></table></div>
+        <div class="table-wrapper"><table><thead><tr><th>ID</th><th>Estudiante</th><th>Materia</th><th>Fecha</th><th>Horario</th><th>Modalidad o Ubicación</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="tutor-tutorias-list"><tr><td colspan="8" style="text-align:center;padding:2rem;">Cargando tutorías...</td></tr></tbody></table></div>
       </div>
     </div>
   `;
