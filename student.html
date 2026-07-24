@@ -54,11 +54,28 @@
     </div>
   </div>
 
+  <!-- Modal: Detalles de Tutoría -->
+  <div id="tutoria-detalles-modal" class="modal-overlay">
+    <div class="modal" style="max-width: 500px;">
+      <div class="modal-header">
+        <h2>Detalles de la Tutoría</h2>
+        <button class="modal-close" onclick="closeStudentTutoriaDetails()">&times;</button>
+      </div>
+      <div class="modal-body" id="tutoria-detalles-body">
+        <!-- Contenido dinámico -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-gray" onclick="closeStudentTutoriaDetails()">Cerrar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 
   <!-- App Modules -->
