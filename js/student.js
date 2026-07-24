@@ -131,7 +131,7 @@ async function loadStudentDashboard(studentName, session) {
           <div class="tutor-mini-card">
             <div class="avatar-lg" style="background:linear-gradient(135deg,var(--green-400),var(--green-600))">${icon('graduation-cap')}</div>
             <div><p class="text-sm text-gray-900">${Validators.sanitize(t.nombre)}</p><p class="text-xs text-gray-600">${Validators.sanitize(t.especialidad || 'General')}</p></div>
-            <button class="btn btn-blue-soft text-xs" onclick="navigateSection('solicitar')">Solicitar</button>
+            <button class="btn btn-blue-soft text-xs" onclick="requestTutor('${Validators.sanitize(t.nombre)}')">Solicitar</button>
           </div>
         `).join('');
       }
@@ -170,6 +170,7 @@ async function loadStudentTutorias(studentName) {
 
   try {
     const tutorias = await queryCollection('tutorias', 'estudiante', '==', studentName);
+    window.studentTutoriasCache = tutorias;
 
     if (tutorias.length === 0) {
       tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 2rem;">No tienes tutorías.</td></tr>';
@@ -184,7 +185,7 @@ async function loadStudentTutorias(studentName) {
         <td class="text-gray-600">${s.fecha || s.requestedDate || '-'}</td>
         <td class="text-gray-600">${s.hora || s.time || '-'}</td>
         <td><span class="badge ${getBadgeClass(s.estado)}">${s.estado}</span></td>
-        <td><button class="link-btn">Detalles</button></td>
+        <td><button class="link-btn" onclick="viewStudentTutoriaDetails('${s.id}')">Detalles</button></td>
       </tr>
     `).join('');
   } catch (error) {
@@ -703,14 +704,23 @@ function buildCompaneros() {
 function buildMisReportes() {
   return `
     <div id="mis-reportes" class="section">
-      <div class="section-header"><h1>Mis Reportes</h1><p>Estadísticas de tu actividad académica</p></div>
-      <div class="grid-4 mb-6">
-        <div class="card"><div class="card-body"><p class="text-sm text-gray-600 mb-1">Total Tutorías</p><p class="text-2xl text-gray-900" id="report-st-total">...</p></div></div>
-        <div class="card"><div class="card-body"><p class="text-sm text-gray-600 mb-1">Asistencia</p><p class="text-2xl text-green-600" id="report-st-asistencia">...</p></div></div>
-        <div class="card"><div class="card-body"><p class="text-sm text-gray-600 mb-1">Completadas</p><p class="text-2xl text-blue-600" id="report-st-completadas">...</p></div></div>
-        <div class="card"><div class="card-body"><p class="text-sm text-gray-600 mb-1">Canceladas</p><p class="text-2xl text-red-500" id="report-st-canceladas">...</p></div></div>
+      <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
+        <div>
+          <h1>Mis Reportes</h1>
+          <p>Estadísticas de tu actividad académica</p>
+        </div>
+        <button class="btn btn-blue" onclick="downloadStudentReportPDF()">Descargar PDF</button>
       </div>
-      <div class="card"><div class="card-header"><h2>Historial por Materia</h2></div><div class="card-body" id="st-hist-materias"><p class="text-sm text-gray-500" style="text-align:center;">Cargando...</p></div></div>
+      <div id="student-report-content" style="background:#fff; padding:1rem; border-radius:8px;">
+        <h2 style="text-align:center; margin-bottom:1.5rem; display:none;" id="st-report-title">Reporte Académico - SGTA-UPLA</h2>
+        <div class="grid-4 mb-6">
+          <div class="card"><div class="card-body"><p class="text-sm text-gray-600 mb-1">Total Tutorías</p><p class="text-2xl text-gray-900" id="report-st-total">...</p></div></div>
+          <div class="card"><div class="card-body"><p class="text-sm text-gray-600 mb-1">Asistencia</p><p class="text-2xl text-green-600" id="report-st-asistencia">...</p></div></div>
+          <div class="card"><div class="card-body"><p class="text-sm text-gray-600 mb-1">Completadas</p><p class="text-2xl text-blue-600" id="report-st-completadas">...</p></div></div>
+          <div class="card"><div class="card-body"><p class="text-sm text-gray-600 mb-1">Canceladas</p><p class="text-2xl text-red-500" id="report-st-canceladas">...</p></div></div>
+        </div>
+        <div class="card"><div class="card-header"><h2>Historial por Materia</h2></div><div class="card-body" id="st-hist-materias"><p class="text-sm text-gray-500" style="text-align:center;">Cargando...</p></div></div>
+      </div>
     </div>
   `;
 }
@@ -744,3 +754,89 @@ function buildStudentConfig(session) {
     </div>
   `;
 }
+
+window.requestTutor = function(tutorName) {
+  navigateSection('solicitar');
+  setTimeout(() => {
+    const select = document.getElementById('sol-tutor');
+    if (select) {
+      for (let i = 0; i < select.options.length; i++) {
+        if (select.options[i].value === tutorName) {
+          select.selectedIndex = i;
+          break;
+        }
+      }
+    }
+  }, 100);
+};
+
+window.viewStudentTutoriaDetails = function(id) {
+  if (!window.studentTutoriasCache) return;
+  const t = window.studentTutoriasCache.find(x => x.id === id);
+  if (t) {
+    const modal = document.getElementById('tutoria-detalles-modal');
+    const body = document.getElementById('tutoria-detalles-body');
+    if (modal && body) {
+      body.innerHTML = `
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--gray-200); padding-bottom:0.5rem;">
+             <span class="text-sm text-gray-500">Tutor:</span>
+             <span class="text-gray-900 font-semibold">${Validators.sanitize(t.tutor || '-')}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--gray-200); padding-bottom:0.5rem;">
+             <span class="text-sm text-gray-500">Materia:</span>
+             <span class="text-gray-900 font-semibold">${Validators.sanitize(t.materia || t.subject || '-')}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--gray-200); padding-bottom:0.5rem;">
+             <span class="text-sm text-gray-500">Fecha y Hora:</span>
+             <span class="text-gray-900">${t.fecha || t.requestedDate || '-'} a las ${t.hora || t.time || '-'}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--gray-200); padding-bottom:0.5rem;">
+             <span class="text-sm text-gray-500">Modalidad o Ubicación:</span>
+             <span class="text-gray-900">${t.ubicacion || t.location || 'Virtual'}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--gray-200); padding-bottom:0.5rem;">
+             <span class="text-sm text-gray-500">Estado:</span>
+             <span class="badge ${getBadgeClass(t.estado)}">${t.estado}</span>
+          </div>
+          <div style="margin-top: 0.5rem;">
+             <span class="text-sm text-gray-500 block mb-2">Observaciones:</span>
+             <p class="text-sm text-gray-900 bg-gray-50" style="padding: 1rem; border-radius: 0.5rem; min-height: 60px;">
+                ${Validators.sanitize(t.observaciones || 'Ninguna observación registrada.')}
+             </p>
+          </div>
+        </div>
+      `;
+      modal.classList.add('active');
+    }
+  }
+};
+
+window.closeStudentTutoriaDetails = function() {
+  const modal = document.getElementById('tutoria-detalles-modal');
+  if (modal) {
+    modal.classList.remove('active');
+  }
+};
+
+window.downloadStudentReportPDF = function() {
+  const element = document.getElementById('student-report-content');
+  if (!element) return;
+  
+  // Show title temporarily for PDF
+  const title = document.getElementById('st-report-title');
+  if (title) title.style.display = 'block';
+
+  const opt = {
+    margin:       0.5,
+    filename:     'mi_reporte_sgta.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2 },
+    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+  
+  html2pdf().set(opt).from(element).save().then(() => {
+    if (title) title.style.display = 'none';
+  });
+};
+
