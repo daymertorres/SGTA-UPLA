@@ -337,16 +337,51 @@ function hideLoader() {
 function setButtonLoading(btn, loading, loadingText = 'Procesando...') {
   if (!btn) return;
   if (loading) {
-    btn._originalText = btn.textContent;
-    btn.textContent = loadingText;
+    if (btn.dataset.originalHtml === undefined) {
+      btn.dataset.originalHtml = btn.innerHTML;
+    }
+    btn.innerHTML = loadingText;
     btn.disabled = true;
     btn.classList.add('btn-loading');
+    btn.setAttribute('data-processing', 'true');
+    btn.style.pointerEvents = 'none';
   } else {
-    btn.textContent = btn._originalText || btn.textContent;
+    if (btn.dataset.originalHtml !== undefined) {
+      btn.innerHTML = btn.dataset.originalHtml;
+    }
     btn.disabled = false;
     btn.classList.remove('btn-loading');
+    btn.removeAttribute('data-processing');
+    btn.style.pointerEvents = '';
   }
 }
+window.setButtonLoading = setButtonLoading;
+
+// --- GLOBAL DOUBLE-CLICK PREVENTION ---
+// Intercepts clicks on all buttons system-wide to prevent double submissions
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('button, .btn');
+  if (!btn) return;
+
+  // If already processing, disabled, or loading, block the click completely
+  if (btn.hasAttribute('data-processing') || btn.disabled || btn.classList.contains('btn-loading')) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    return;
+  }
+
+  // Set a temporary lock to prevent rapid consecutive clicks (e.g. double tap)
+  btn.setAttribute('data-processing', 'true');
+  btn.style.pointerEvents = 'none';
+
+  // Auto-release the lock after 1000ms for regular buttons that don't call setButtonLoading
+  setTimeout(() => {
+    if (!btn.disabled && !btn.classList.contains('btn-loading')) {
+      btn.removeAttribute('data-processing');
+      btn.style.pointerEvents = '';
+    }
+  }, 1000);
+}, true); // Use capture phase to intercept BEFORE inline onclick attributes fire
 
 /**
  * Formatear fecha Firestore timestamp a string legible
@@ -431,4 +466,34 @@ function initDashboard() {
   setupLogout();
 }
 
+/**
+ * Setup global search (searches across visible cards and rows)
+ */
+window.setupGlobalSearch = function() {
+  const searchInput = document.getElementById('search-input');
+  if (!searchInput) return;
 
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.toLowerCase().trim();
+    const activeSection = document.querySelector('.section.active') || document.querySelector('.main-content') || document;
+
+    const items = activeSection.querySelectorAll('tbody tr, .delegado-card, .tutor-mini-card, .tutor-card, .tutoria-card, .materia-card, .solicitud-card');
+    
+    // If length < 2 but not empty, wait for more typing
+    if (query.length < 2 && query.length !== 0) {
+      return;
+    }
+
+    // Reset if empty
+    if (query.length === 0) {
+      items.forEach(item => item.style.display = '');
+      return;
+    }
+
+    // Filter
+    items.forEach(item => {
+      const text = item.textContent.toLowerCase();
+      item.style.display = text.includes(query) ? '' : 'none';
+    });
+  });
+};

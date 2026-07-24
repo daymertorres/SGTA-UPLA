@@ -71,25 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ---------- GLOBAL SEARCH ---------- */
-function setupGlobalSearch() {
-  const searchInput = document.getElementById('search-input');
-  if (!searchInput) return;
-
-  searchInput.addEventListener('input', () => {
-    const query = searchInput.value.toLowerCase().trim();
-    if (query.length < 2) return;
-
-    // Search across visible table
-    const activeSection = document.querySelector('.section.active');
-    if (!activeSection) return;
-
-    const rows = activeSection.querySelectorAll('tbody tr');
-    rows.forEach(row => {
-      const text = row.textContent.toLowerCase();
-      row.style.display = text.includes(query) ? '' : 'none';
-    });
-  });
-}
+// setupGlobalSearch is now handled in app.js
 
 /* ---------- DATA LOADING ---------- */
 async function initAdminData() {
@@ -786,13 +768,16 @@ async function loadAdminDelegados() {
 
   try {
     const delegados = await queryCollection('usuarios', 'rol', '==', 'Estudiante Delegado');
+    const allTutorias = await getCollection('tutorias');
     
     if (delegados.length === 0) {
       container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666; grid-column: span 3;">No hay delegados asignados.</div>';
       return;
     }
 
-    container.innerHTML = delegados.map(d => `
+    container.innerHTML = delegados.map(d => {
+      const delegTutorias = allTutorias.filter(t => t.estudiante === d.nombre || t.student === d.nombre);
+      return `
       <div class="delegado-card">
         <div class="delegado-header">
           <div class="avatar-lg" style="background:linear-gradient(135deg,var(--purple-400),var(--purple-600))">${icon('shield')}</div>
@@ -803,12 +788,13 @@ async function loadAdminDelegados() {
         </div>
         <div class="delegado-stats">
           <div class="delegado-stat"><span class="text-gray-600">Email:</span><span class="text-gray-900" style="font-size: 0.8rem">${Validators.sanitize(d.email)}</span></div>
-          <div class="delegado-stat"><span class="text-gray-600">Tutorías:</span><span class="text-gray-900">${d.tutorias || 0}</span></div>
+          <div class="delegado-stat"><span class="text-gray-600">Tutorías:</span><span class="text-gray-900">${delegTutorias.length}</span></div>
           <div class="delegado-stat"><span class="text-gray-600">Estado:</span><span class="${d.estado === 'Activo' ? 'text-green-600' : 'text-amber-600'}">${d.estado}</span></div>
         </div>
         <button class="btn btn-purple-soft btn-full" onclick="openUserModal('${d.id}')">Editar</button>
       </div>
-    `).join('');
+      `;
+    }).join('');
   } catch (error) {
     console.error("Error cargando delegados:", error);
     container.innerHTML = '<div style="padding: 2rem; text-align: center; color: red; grid-column: span 3;">Error al cargar delegados.</div>';

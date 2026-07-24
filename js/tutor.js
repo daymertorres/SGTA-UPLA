@@ -19,6 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Setup user info
   setupUserInfo(session);
 
+  // Setup global search
+  if (typeof window.setupGlobalSearch === 'function') {
+    window.setupGlobalSearch();
+  }
+
   // Menu
   const menuItems = [
     { icon: 'home', label: 'Inicio', section: 'inicio', badge: null },
