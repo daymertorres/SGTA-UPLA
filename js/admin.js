@@ -225,6 +225,7 @@ window.openUserModal = function(userId = null) {
   const form = document.getElementById('user-form');
   
   Validators.clearFormErrors(form);
+  form.reset();
   document.getElementById('user-id').value = '';
 
   const toggleBtn = document.getElementById('toggle-user-password');
@@ -1366,7 +1367,10 @@ function buildReportes() {
           <h3 class="mb-4">Generar Nuevo Reporte</h3>
           <div class="space-y-3">
             <div><label class="form-label">Tipo de Reporte</label><select class="form-select" id="report-type"><option>Mensual</option><option>Semanal</option><option>Por Ciclo</option><option>Por Tutor</option><option>Por Materia</option></select></div>
-            <div><label class="form-label">Período</label><input type="month" class="form-input" id="report-period" value="${new Date().toISOString().substring(0,7)}"></div>
+            <div class="grid-2 gap-4">
+              <div><label class="form-label">Fecha Inicio (opcional)</label><input type="date" class="form-input" id="report-start"></div>
+              <div><label class="form-label">Fecha Fin (opcional)</label><input type="date" class="form-input" id="report-end"></div>
+            </div>
             <button class="btn btn-blue btn-full" onclick="generateReport()">Generar Reporte</button>
           </div>
         </div></div>
@@ -1392,7 +1396,8 @@ function buildReportes() {
 /* Report generation */
 window.generateReport = async function() {
   const type = document.getElementById('report-type').value;
-  const period = document.getElementById('report-period').value;
+  const start = document.getElementById('report-start').value;
+  const end = document.getElementById('report-end').value;
   const container = document.getElementById('report-results');
 
   container.innerHTML = '<p class="text-sm text-gray-500" style="text-align:center; padding: 2rem;">Generando reporte...</p>';
@@ -1403,14 +1408,12 @@ window.generateReport = async function() {
 
     let reportData = allTutorias;
 
-    // Filter by period if applicable
-    if (period) {
-      const [year, month] = period.split('-').map(Number);
+    // Filter by date range if provided
+    if (start || end) {
       reportData = allTutorias.filter(t => {
-        if (t.fecha) {
-          const d = new Date(t.fecha);
-          if (!isNaN(d.getTime())) return d.getMonth() + 1 === month && d.getFullYear() === year;
-        }
+        if (!t.fecha) return false;
+        if (start && t.fecha < start) return false;
+        if (end && t.fecha > end) return false;
         return true;
       });
     }
@@ -1420,40 +1423,100 @@ window.generateReport = async function() {
     const pendientes = reportData.filter(t => t.estado === 'Pendiente').length;
     const aceptadas = reportData.filter(t => t.estado === 'Aceptada').length;
 
-    container.innerHTML = `
-      <div class="grid-4 mb-6">
-        <div style="text-align:center;padding:1rem;">
-          <p class="text-2xl text-gray-900">${reportData.length}</p>
-          <p class="text-sm text-gray-600">Total</p>
-        </div>
-        <div style="text-align:center;padding:1rem;">
-          <p class="text-2xl text-green-600">${completadas}</p>
-          <p class="text-sm text-gray-600">Finalizadas</p>
-        </div>
-        <div style="text-align:center;padding:1rem;">
-          <p class="text-2xl text-amber-600">${pendientes + aceptadas}</p>
-          <p class="text-sm text-gray-600">En Proceso</p>
-        </div>
-        <div style="text-align:center;padding:1rem;">
-          <p class="text-2xl text-red-500">${canceladas}</p>
-          <p class="text-sm text-gray-600">Canceladas</p>
-        </div>
-      </div>
-      <div class="table-wrapper">
+    let tableHtml = '';
+
+    if (type === 'Mensual' || type === 'Semanal') {
+      tableHtml = `
         <table>
           <thead><tr><th>Estudiante</th><th>Tutor</th><th>Materia</th><th>Fecha</th><th>Estado</th></tr></thead>
           <tbody>
-            ${reportData.length > 0 ? reportData.slice(0, 20).map(t => `
+            ${reportData.length > 0 ? reportData.slice(0, 50).map(t => `
               <tr>
                 <td class="text-gray-900">${Validators.sanitize(t.estudiante || t.student || '-')}</td>
                 <td class="text-gray-900">${Validators.sanitize(t.tutor || '-')}</td>
                 <td class="text-gray-600">${Validators.sanitize(t.materia || t.subject || '-')}</td>
                 <td class="text-gray-600">${t.fecha || '-'}</td>
-                <td><span class="badge ${getBadgeClass(t.estado)}">${t.estado}</span></td>
+                <td>${t.estado}</td>
               </tr>
             `).join('') : '<tr><td colspan="5" style="text-align:center;padding:2rem;">No hay datos para este período.</td></tr>'}
           </tbody>
         </table>
+      `;
+    } else if (type === 'Por Tutor' || type === 'Por Materia' || type === 'Por Ciclo') {
+      const groups = {};
+      
+      reportData.forEach(t => {
+        let key = 'Desconocido';
+        if (type === 'Por Tutor') key = t.tutor || 'Sin Tutor';
+        if (type === 'Por Materia') key = t.materia || t.subject || 'Sin Materia';
+        if (type === 'Por Ciclo') {
+          const studentName = t.estudiante || t.student;
+          const studentUser = allUsers.find(u => u.nombre === studentName);
+          key = studentUser && studentUser.ciclo ? studentUser.ciclo : 'Desconocido';
+        }
+        
+        if (!groups[key]) groups[key] = { total: 0, completadas: 0, canceladas: 0 };
+        groups[key].total++;
+        if (t.estado === 'Finalizada' || t.estado === 'Completada') groups[key].completadas++;
+        if (t.estado === 'Cancelada') groups[key].canceladas++;
+      });
+
+      const groupLabel = type === 'Por Tutor' ? 'Tutor' : type === 'Por Materia' ? 'Materia' : 'Ciclo';
+
+      const rows = Object.entries(groups).map(([k, v]) => {
+        const tasa = v.total > 0 ? Math.round((v.completadas / v.total) * 100) : 0;
+        return `
+          <tr>
+            <td class="text-gray-900 font-semibold">${Validators.sanitize(k)}</td>
+            <td class="text-gray-600">${v.total}</td>
+            <td class="text-green-600">${v.completadas}</td>
+            <td class="text-red-500">${v.canceladas}</td>
+            <td><span class="badge ${tasa >= 80 ? 'badge-green' : tasa >= 50 ? 'badge-amber' : 'badge-red'}">${tasa}%</span></td>
+          </tr>
+        `;
+      }).join('');
+
+      tableHtml = `
+        <table>
+          <thead><tr><th>${groupLabel}</th><th>Total Tutorías</th><th>Completadas</th><th>Canceladas</th><th>Tasa de Éxito</th></tr></thead>
+          <tbody>
+            ${rows || `<tr><td colspan="5" style="text-align:center;padding:2rem;">No hay datos para este período.</td></tr>`}
+          </tbody>
+        </table>
+      `;
+    }
+
+    container.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h3 style="font-size:1.25rem; font-weight:600;">Reporte Generado (${type})</h3>
+        <button class="btn btn-blue" onclick="downloadAdminReportPDF()">Descargar PDF</button>
+      </div>
+      <div id="admin-report-content" style="background:#fff; padding:1rem; border-radius:8px;">
+        <h2 style="text-align:center; margin-bottom:0.5rem;">Reporte Estadístico - SGTA-UPLA</h2>
+        <p style="text-align:center; margin-bottom:1.5rem; color:#6b7280; font-size:0.875rem;">
+          ${start || end ? 'Período: ' + (start || 'Inicio') + ' al ' + (end || 'Fin') : 'Todas las fechas'} | Tipo: ${type}
+        </p>
+        <div class="grid-4 mb-6">
+          <div style="text-align:center;padding:1rem;">
+            <p class="text-2xl text-gray-900">${reportData.length}</p>
+            <p class="text-sm text-gray-600">Total</p>
+          </div>
+          <div style="text-align:center;padding:1rem;">
+            <p class="text-2xl text-green-600">${completadas}</p>
+            <p class="text-sm text-gray-600">Finalizadas</p>
+          </div>
+          <div style="text-align:center;padding:1rem;">
+            <p class="text-2xl text-amber-600">${pendientes + aceptadas}</p>
+            <p class="text-sm text-gray-600">En Proceso</p>
+          </div>
+          <div style="text-align:center;padding:1rem;">
+            <p class="text-2xl text-red-500">${canceladas}</p>
+            <p class="text-sm text-gray-600">Canceladas</p>
+          </div>
+        </div>
+        <div class="table-wrapper">
+          ${tableHtml}
+        </div>
       </div>
     `;
 
@@ -1551,3 +1614,16 @@ function buildConfiguracion() {
     </div>
   `;
 }
+
+window.downloadAdminReportPDF = function() {
+  const element = document.getElementById('admin-report-content');
+  if (!element) return;
+  const opt = {
+    margin:       0.5,
+    filename:     'reporte_admin_sgta.pdf',
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2 },
+    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+  };
+  html2pdf().set(opt).from(element).save();
+};
